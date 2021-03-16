@@ -1,0 +1,16 @@
+[submodule "freeswitch"]
+	path = freeswitch
+	url = https://github.com/ProVoice/freeswitch.git
+	branch = v1.10
+[submodule "sofia-sip"]
+	path = sofia-sip
+	url = https://github.com/ProVoice/sofia-sip.git
+	branch = master
+[submodule "spandsp"]
+	path = spandsp
+	url = https://github.com/ProVoice/spandsp.git
+	branch = master
+[submodule "freeswitch-sounds"]
+	path = freeswitch-sounds
+	url = https://github.com/ProVoice/freeswitch-sounds.git
+	branch = master

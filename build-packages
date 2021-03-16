@@ -1,0 +1,214 @@
+#!/bin/bash
+cd /app
+
+# Check if the packages destination is a directory
+if [ ! -d "/app/packages" ]; then
+	echo -e "\033[1;31mDestination directory does not exist\033[0m"
+	exit 1
+fi
+
+# Check if the packages destination is empty
+if [ ! -z "$(ls -A /app/packages)" ]; then
+	echo -e "\033[1;31mDestination directory is not empty\033[0m"
+	exit 1
+fi
+
+# Announce that the build process is starting
+figlet provoice
+echo -e "\033[1;32mProVoice packages build environment for FreeSWITCH using Docker\033[0m\n"
+echo "MediaServe International B.V."
+echo "https://github.com/ProVoice"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Build sofia-sip packages
+
+cd /app/sofia-sip
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "sofia-sip" --newversion "${SOFIASIP_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./sofia-sip-build-deps_*.deb
+rm ./sofia-sip-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+( cd /app; apt install -f -y ./*.deb )
+
+# Build spandsp packages
+
+cd /app/spandsp
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "spandsp" --newversion "${SPANDSP_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./spandsp-build-deps_*.deb
+rm ./spandsp-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+( cd /app; apt install -f -y ./*.deb )
+
+# Build freeswitch-music-default packages
+
+cp -r /app/freeswitch-sounds /app/freeswitch-music-default
+cd /app/freeswitch-music-default
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Bootstrap FreeSWITCH Sounds Debian files and building source
+./debian/bootstrap.sh -p freeswitch-music-default
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-music-default" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./freeswitch-music-default-build-deps_*.deb
+rm ./freeswitch-music-default-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+# Build freeswitch-sounds-en-us-callie packages
+
+cp -r /app/freeswitch-sounds /app/freeswitch-sounds-en-us-callie
+cd /app/freeswitch-sounds-en-us-callie
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Bootstrap FreeSWITCH Sounds Debian files and building source
+./debian/bootstrap.sh -p freeswitch-sounds-en-us-callie
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-callie" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./freeswitch-sounds-en-us-callie-build-deps_*.deb
+rm ./freeswitch-sounds-en-us-callie-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+# Build freeswitch-sounds-en-us-allison packages
+
+cp -r /app/freeswitch-sounds /app/freeswitch-sounds-en-us-allison
+cd /app/freeswitch-sounds-en-us-allison
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Bootstrap FreeSWITCH Sounds Debian files and building source
+./debian/bootstrap.sh -p freeswitch-sounds-en-us-allison
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-allison" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./freeswitch-sounds-en-us-allison-build-deps_*.deb
+rm ./freeswitch-sounds-en-us-allison-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+# Build freeswitch packages
+
+cd /app/freeswitch
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Apply patches
+find /app/patches -name '*.patch' -exec git apply '{}' \;
+
+# Bootstrap FreeSWITCH Debian files
+( cd debian && ./bootstrap.sh )
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch" --newversion "${FREESWITCH_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./freeswitch-build-deps_*.deb
+rm ./freeswitch-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+# Copy the debian files to the destination
+rsync -Sxt \
+ --exclude README.md \
+ --exclude LICENSE \
+ --exclude Dockerfile \
+ --exclude build-packages \
+ --exclude freeswitch \
+ --exclude freeswitch-music-default \
+ --exclude freeswitch-sounds \
+ --exclude freeswitch-sounds-en-us-allison \
+ --exclude freeswitch-sounds-en-us-callie \
+ --exclude sofia-sip \
+ --exclude spandsp \
+ --exclude packages \
+ --exclude patches \
+/app/* /app/packages
+
+# Announce that the build process is done
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+echo -e "\033[1;32mBuild process has completed\033[0m"
