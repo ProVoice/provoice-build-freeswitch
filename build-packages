@@ -110,14 +110,23 @@ cd /app/freeswitch-sounds-en-us-callie
 
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
-# Bootstrap FreeSWITCH Sounds Debian files and building source
-./debian/bootstrap.sh -p freeswitch-sounds-en-us-callie
+# Install the dependencies
+apt update
+apt install -f -y sox flac
 
 # Create the updated version
 rm debian/changelog
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-callie" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Download the sources
+mkdir -p /app/sounds
+cp -R debian /app/sounds/
+cd /app/sounds
+./debian/bootstrap.sh -p freeswitch-sounds-en-us-callie
+./debian/rules get-orig-source
+tar -xv --strip-components=1 -f *_*.orig.tar.xz && mv *_*.orig.tar.xz ../
 
 # Install the dependencies
 apt update
@@ -132,6 +141,9 @@ echo 1 > debian/source/format
 # Build the source and packages files
 debuild -i -us -uc
 
+cd /app/
+rm sounds -fr
+
 # Build freeswitch-sounds-en-us-allison packages
 
 cp -r /app/freeswitch-sounds /app/freeswitch-sounds-en-us-allison
@@ -139,14 +151,23 @@ cd /app/freeswitch-sounds-en-us-allison
 
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
-# Bootstrap FreeSWITCH Sounds Debian files and building source
-./debian/bootstrap.sh -p freeswitch-sounds-en-us-allison
+# Install the dependencies
+apt update
+apt install -f -y sox flac
 
 # Create the updated version
 rm debian/changelog
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-allison" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Download the sources
+mkdir -p /app/sounds
+cp -R debian /app/sounds/
+cd /app/sounds
+./debian/bootstrap.sh -p freeswitch-sounds-en-us-allison
+./debian/rules get-orig-source
+tar -xv --strip-components=1 -f *_*.orig.tar.xz && mv *_*.orig.tar.xz ../
 
 # Install the dependencies
 apt update
@@ -160,6 +181,9 @@ echo 1 > debian/source/format
 
 # Build the source and packages files
 debuild -i -us -uc
+
+cd /app/
+rm sounds -fr
 
 # Build freeswitch packages
 

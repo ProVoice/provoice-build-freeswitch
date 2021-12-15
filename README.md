@@ -31,7 +31,7 @@ sudo docker run -it \
  -v `pwd`/patches:/app/patches \
  -e FREESWITCH_VERSION='1.10.7' \
  -e SOFIASIP_VERSION='1.13.6' \
- -e SPANDSP_VERSION='3.0.0.1' \
+ -e SPANDSP_VERSION='3.0.1' \
  -e FSSOUNDS_VERSION='1.0.52' \
 provoice-build-freeswitch
 ```

@@ -1,5 +1,5 @@
 diff --git a/debian/bootstrap.sh b/debian/bootstrap.sh
-index 66adadd025..4cfceddce7 100755
+index fd5ff75cf0..98a5cc20bd 100755
 --- a/debian/bootstrap.sh
 +++ b/debian/bootstrap.sh
 @@ -2,7 +2,7 @@
@@ -14,13 +14,13 @@ index 66adadd025..4cfceddce7 100755
 @@ -30,7 +30,7 @@ lang_dir="../conf/vanilla/lang"
  fs_description="FreeSWITCH is a scalable open source cross-platform telephony platform designed to route and interconnect popular communication protocols using audio, video, text or any other form of media."
  mod_build_depends="." mod_depends="." mod_recommends="." mod_suggests="."
- supported_debian_distros="wheezy jessie stretch buster sid"
+ supported_debian_distros="wheezy jessie stretch buster bullseye sid"
 -supported_ubuntu_distros="trusty utopic xenial"
 +supported_ubuntu_distros="trusty utopic xenial focal"
  supported_distros="$supported_debian_distros $supported_ubuntu_distros"
  avoid_mods=(
    applications/mod_sms_flowroute
-@@ -97,6 +97,23 @@ avoid_mods_xenial=(
+@@ -97,6 +97,24 @@ avoid_mods_xenial=(
    asr_tts/mod_flite
    loggers/mod_raven
  )
@@ -37,10 +37,20 @@ index 66adadd025..4cfceddce7 100755
 +  applications/mod_cv
 +  event_handlers/mod_erlang_event
 +  event_handlers/mod_rayo
-+  languages/mod_perl
 +  applications/mod_snom
 +  event_handlers/mod_snmp
++  asr_tts/mod_pocketsphinx
++  endpoints/mod_verto
 +)
  manual_pkgs=(
  freeswitch-all
  freeswitch
+@@ -329,7 +347,7 @@ Build-Depends:
+ # documentation
+  doxygen,
+ # for APR (not essential for build)
+- uuid-dev, libexpat1-dev, libgdbm-dev, libdb-dev,
++ uuid-dev, libexpat1-dev, libgdbm-dev, libgdbm-compat-dev, libdb-dev,
+ # used by many modules
+  libcurl4-openssl-dev | libcurl4-gnutls-dev | libcurl-dev,
+  bison, zlib1g-dev, libsofia-sip-ua-dev (>= 1.13.6),
