@@ -1,5 +1,27 @@
+diff --git a/configure.ac b/configure.ac
+index f8b9cadaf6..7270f08424 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1763,7 +1763,7 @@ then
+ 
+ 		AC_MSG_CHECKING([for python distutils])
+ 		python_result="`$PYTHON -c 'import distutils;' 2>&1`"
+-		if test -z "$python_result" ; then
++		if test $? -eq 0; then
+ 			python_has_distutils="yes"
+ 		else
+ 			python_has_distutils="no"
+@@ -1884,7 +1884,7 @@ then
+ 
+ 		AC_MSG_CHECKING([for python3 distutils])
+ 		python3_result="`$PYTHON3 -c 'import distutils;' 2>&1`"
+-		if test -z "$python3_result" ; then
++		if test $? -eq 0 ; then
+ 			python3_has_distutils="yes"
+ 		else
+ 			python3_has_distutils="no"
 diff --git a/debian/bootstrap.sh b/debian/bootstrap.sh
-index fd5ff75cf0..98a5cc20bd 100755
+index 71c5b52f99..42328bab0a 100755
 --- a/debian/bootstrap.sh
 +++ b/debian/bootstrap.sh
 @@ -2,7 +2,7 @@
@@ -7,7 +29,7 @@ index fd5ff75cf0..98a5cc20bd 100755
  ##### Author: Travis Cross <tc@traviscross.com>
  
 -codename="sid"
-+codename="focal"
++codename="jammy"
  modulelist_opt=""
  modules_add=""
  use_sysvinit=""
@@ -16,15 +38,15 @@ index fd5ff75cf0..98a5cc20bd 100755
  mod_build_depends="." mod_depends="." mod_recommends="." mod_suggests="."
  supported_debian_distros="wheezy jessie stretch buster bullseye sid"
 -supported_ubuntu_distros="trusty utopic xenial"
-+supported_ubuntu_distros="trusty utopic xenial focal"
++supported_ubuntu_distros="trusty utopic xenial jammy"
  supported_distros="$supported_debian_distros $supported_ubuntu_distros"
  avoid_mods=(
    applications/mod_sms_flowroute
-@@ -97,6 +97,24 @@ avoid_mods_xenial=(
+@@ -97,6 +97,29 @@ avoid_mods_xenial=(
    asr_tts/mod_flite
    loggers/mod_raven
  )
-+avoid_mods_focal=(
++avoid_mods_jammy=(
 +  directories/mod_ldap
 +  databases/mod_mariadb
 +  applications/mod_signalwire
@@ -41,11 +63,21 @@ index fd5ff75cf0..98a5cc20bd 100755
 +  event_handlers/mod_snmp
 +  asr_tts/mod_pocketsphinx
 +  endpoints/mod_verto
++  applications/mod_av
++  languages/mod_basic
++  event_handlers/mod_radius_cdr
++  endpoints/mod_rtmp
++  endpoints/mod_skinny
 +)
  manual_pkgs=(
  freeswitch-all
  freeswitch
-@@ -329,7 +347,7 @@ Build-Depends:
+@@ -325,11 +348,11 @@ Build-Depends:
+ # configure options
+  libssl1.0-dev | libssl-dev, unixodbc-dev, libpq-dev,
+  libncurses5-dev, libjpeg62-turbo-dev | libjpeg-turbo8-dev | libjpeg62-dev | libjpeg8-dev,
+- python-dev | python-dev-is-python2, python3-dev, python-all-dev, python-support (>= 0.90) | dh-python, erlang-dev, libtpl-dev (>= 1.5),
++ python-dev | python2-dev | python-dev-is-python2, python3-dev, python-all-dev, python-support (>= 0.90) | dh-python, erlang-dev, libtpl-dev (>= 1.5),
  # documentation
   doxygen,
  # for APR (not essential for build)
@@ -54,3 +86,38 @@ index fd5ff75cf0..98a5cc20bd 100755
  # used by many modules
   libcurl4-openssl-dev | libcurl4-gnutls-dev | libcurl-dev,
   bison, zlib1g-dev, libsofia-sip-ua-dev (>= 1.13.6),
+diff --git a/debian/control-modules b/debian/control-modules
+index b9d7a05933..d9ebe40737 100644
+--- a/debian/control-modules
++++ b/debian/control-modules
+@@ -11,7 +11,7 @@ Description: Abstraction layer for APIs
+ Module: applications/mod_av
+ Description: mod_av
+  Adds mod_av.
+-Build-Depends: libavformat-dev, libswscale-dev, libavresample-dev
++Build-Depends: libavformat-dev, libswscale-dev, libavresample-dev | libswresample-dev
+ 
+ Module: applications/mod_avmd
+ Description: Advanced voicemail detection
+@@ -663,7 +663,7 @@ Build-Depends-Bullseye: libperl-dev, libgdbm-compat-dev
+ Module: languages/mod_python
+ Description: mod_python
+  Adds mod_python.
+-Build-Depends: python-dev | python-dev-is-python2
++Build-Depends: python-dev | python2-dev | python-dev-is-python2
+ 
+ Module: languages/mod_python3
+ Description: mod_python3
+diff --git a/debian/rules b/debian/rules
+index c11f733e8c..7473817bcb 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -74,7 +74,7 @@ override_dh_auto_clean:
+ 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+ 		--prefix=/usr --localstatedir=/var --sysconfdir=/etc \
+ 		--with-gnu-ld --with-python --with-python3 --with-erlang --with-openssl \
+-		--enable-core-odbc-support --enable-zrtp
++		--enable-core-odbc-support --enable-zrtp --disable-libvpx
+ 	touch $@
+ 
+ override_dh_auto_configure: .stamp-configure

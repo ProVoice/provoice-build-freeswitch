@@ -3,7 +3,7 @@ ProVoice packages build environment for FreeSWITCH using Docker
 
 ## About
 
-This project aims to make reproducable Debian packages of FreeSWITCH for Ubuntu 20.04 LTS by using Docker. We have chosen to use upstream MySQL packages instead of the default packages in the Ubuntu repository. Feel free to remove these lines in the Dockerfile if that would fit your environment better. Create an empty directory for the packages and run the container to build the Debian packages.
+This project aims to make reproducable Debian packages of FreeSWITCH for Ubuntu 22.04 LTS by using Docker. We have chosen to use upstream MySQL packages instead of the default packages in the Ubuntu repository. Feel free to remove these lines in the Dockerfile if that would fit your environment better. Create an empty directory for the packages and run the container to build the Debian packages.
 
 In this build we are removing the Cluecon advertisements from the CLI. Version numbers for the packages have to be set through environmental variables while running the Docker container.
 
@@ -29,10 +29,13 @@ sudo docker run -it \
  --rm \
  -v `pwd`/packages:/app/packages \
  -v `pwd`/patches:/app/patches \
- -e FREESWITCH_VERSION='1.10.7' \
- -e SOFIASIP_VERSION='1.13.6' \
- -e SPANDSP_VERSION='3.0.1' \
- -e FSSOUNDS_VERSION='1.0.52' \
+ -e FREESWITCH_VERSION='1.10.8' \
+ -e SOFIASIP_VERSION='1.13.9' \
+ -e SPANDSP_VERSION='3.0.2' \
+ -e FSSOUNDS_VERSION='1.0.53' \
+ -e FSSOUNDS_VERSION_CALLIE='1.0.53' \
+ -e FSSOUNDS_VERSION_ALLISON='1.0.2' \
+ -e FSSOUNDS_VERSION_JUNE='1.0.51' \
 provoice-build-freeswitch
 ```
-The packages and source files should now be in the `packages` directory and ready to install on Ubuntu 20.04 LTS.
+The packages and source files should now be in the `packages` directory and ready to install on Ubuntu 22.04 LTS.

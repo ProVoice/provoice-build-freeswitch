@@ -2,7 +2,7 @@
 # MediaServe International B.V.
 # https://github.com/ProVoice
 
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 SHELL ["/bin/bash", "-c"]
 WORKDIR /app
@@ -13,6 +13,7 @@ RUN apt update
 RUN apt install -y -f curl nodejs npm nano iputils-ping expect telnet grep sed devscripts debhelper build-essential equivs rsync figlet
 RUN curl -LO https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb
 RUN apt install -y -f ./mysql-apt-config_0.8.16-1_all.deb
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
 RUN apt update
 RUN apt install -y -f mysql-client
 RUN rm /var/lib/apt/lists/* /app/mysql-apt-config_0.8.16-1_all.deb -fr

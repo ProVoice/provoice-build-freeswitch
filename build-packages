@@ -18,7 +18,6 @@ figlet provoice
 echo -e "\033[1;32mProVoice packages build environment for FreeSWITCH using Docker\033[0m\n"
 echo "MediaServe International B.V."
 echo "https://github.com/ProVoice"
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 # Build sofia-sip packages
 
@@ -28,7 +27,7 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 # Create the updated version
 rm debian/changelog
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "sofia-sip" --newversion "${SOFIASIP_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "sofia-sip" --newversion "${SOFIASIP_VERSION}" "Release for ProVoice on Ubuntu 22.04 LTS"
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
 
@@ -55,7 +54,7 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 # Create the updated version
 rm debian/changelog
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "spandsp" --newversion "${SPANDSP_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "spandsp" --newversion "${SPANDSP_VERSION}" "Release for ProVoice on Ubuntu 22.04 LTS"
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
 
@@ -68,6 +67,17 @@ rm ./spandsp-build-deps_*.deb
 # Allow creating the source file
 mkdir -p debian/source
 echo 1 > debian/source/format
+
+# Fix an error in xsltproc, download remote sources before running
+mkdir -p /app/xsl/current/xhtml/ /app/xsl/current/lib/ /app/xsl/current/common/
+for file in xsl/current/xhtml/chunk.xsl xsl/current/xhtml/docbook-no-doctype.xsl xsl/current/xhtml/chunk-common.xsl xsl/current/xhtml/chunk-code.xsl xsl/current/VERSION.xsl xsl/current/xhtml/param.xsl xsl/current/lib/lib.xsl xsl/current/common/l10n.xsl xsl/current/common/common.xsl xsl/current/common/utility.xsl xsl/current/common/labels.xsl xsl/current/common/titles.xsl xsl/current/common/subtitles.xsl xsl/current/common/gentext.xsl xsl/current/common/targets.xsl xsl/current/common/olink.xsl xsl/current/common/pi.xsl xsl/current/xhtml/autotoc.xsl xsl/current/xhtml/autoidx.xsl xsl/current/xhtml/lists.xsl xsl/current/xhtml/callout.xsl xsl/current/xhtml/verbatim.xsl xsl/current/xhtml/graphics.xsl xsl/current/xhtml/xref.xsl xsl/current/xhtml/formal.xsl xsl/current/xhtml/table.xsl xsl/current/xhtml/htmltbl.xsl xsl/current/xhtml/sections.xsl xsl/current/xhtml/inline.xsl xsl/current/xhtml/footnote.xsl xsl/current/xhtml/html.xsl xsl/current/xhtml/its.xsl xsl/current/xhtml/info.xsl xsl/current/xhtml/keywords.xsl xsl/current/xhtml/division.xsl xsl/current/xhtml/toc.xsl xsl/current/xhtml/index.xsl xsl/current/xhtml/refentry.xsl xsl/current/xhtml/math.xsl xsl/current/xhtml/admon.xsl xsl/current/xhtml/component.xsl xsl/current/xhtml/biblio.xsl xsl/current/xhtml/biblio-iso690.xsl xsl/current/xhtml/glossary.xsl xsl/current/xhtml/block.xsl xsl/current/xhtml/task.xsl xsl/current/xhtml/qandaset.xsl xsl/current/xhtml/synop.xsl xsl/current/xhtml/titlepage.xsl xsl/current/xhtml/titlepage.templates.xsl xsl/current/xhtml/pi.xsl xsl/current/xhtml/ebnf.xsl xsl/current/xhtml/chunker.xsl xsl/current/xhtml/html-rtf.xsl xsl/current/xhtml/annotations.xsl xsl/current/common/stripns.xsl xsl/current/xhtml/publishers.xsl xsl/current/common/table.xsl
+do
+wget -O /app/${file} https://docbook.sourceforge.net/release/${file}
+done
+
+# Update XSL files to use local instead of remote sources
+sed -i 's/http:\/\/docbook.sourceforge.net\/release\/xsl\/current\/xhtml\/chunk.xsl/\/app\/xsl\/current\/xhtml\/chunk.xsl/g' /app/spandsp/wrapper.xsl
+sed -i 's/http:\/\/docbook.sourceforge.net\/release\/xsl\/current\/xhtml\/chunk.xsl/\/app\/xsl\/current\/xhtml\/chunk.xsl/g' /app/spandsp/doc/wrapper.xsl
 
 # Build the source and packages files
 debuild -i -us -uc
@@ -86,9 +96,12 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 # Create the updated version
 rm debian/changelog
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-music-default" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-music-default" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 22.04 LTS"
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Fix version number
+cp debian/changelog debian/freeswitch-music-default.changelog
 
 # Install the dependencies
 apt update
@@ -114,19 +127,23 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 apt update
 apt install -f -y sox flac
 
-# Create the updated version
-rm debian/changelog
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-callie" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
-
 # Download the sources
 mkdir -p /app/sounds
 cp -R debian /app/sounds/
 cd /app/sounds
 ./debian/bootstrap.sh -p freeswitch-sounds-en-us-callie
 ./debian/rules get-orig-source
-tar -xv --strip-components=1 -f *_*.orig.tar.xz && mv *_*.orig.tar.xz ../
+
+tar -xv --strip-components=1 -f *_*.orig.tar.xz && rm *_*.orig.tar.xz
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-callie" --newversion "${FSSOUNDS_VERSION_CALLIE}" "Release for ProVoice on Ubuntu 22.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Fix version number
+cp debian/changelog debian/freeswitch-sounds-en-us-callie.changelog
 
 # Install the dependencies
 apt update
@@ -155,25 +172,74 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 apt update
 apt install -f -y sox flac
 
-# Create the updated version
-rm debian/changelog
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-allison" --newversion "${FSSOUNDS_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
-
 # Download the sources
 mkdir -p /app/sounds
 cp -R debian /app/sounds/
 cd /app/sounds
 ./debian/bootstrap.sh -p freeswitch-sounds-en-us-allison
 ./debian/rules get-orig-source
-tar -xv --strip-components=1 -f *_*.orig.tar.xz && mv *_*.orig.tar.xz ../
+
+tar -xv --strip-components=1 -f *_*.orig.tar.xz && rm *_*.orig.tar.xz
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-us-allison" --newversion "${FSSOUNDS_VERSION_ALLISON}" "Release for ProVoice on Ubuntu 22.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Fix version number
+cp debian/changelog debian/freeswitch-sounds-en-us-allison.changelog
 
 # Install the dependencies
 apt update
 mk-build-deps
 apt install -f -y ./freeswitch-sounds-en-us-allison-build-deps_*.deb
 rm ./freeswitch-sounds-en-us-allison-build-deps_*.deb
+
+# Allow creating the source file
+mkdir -p debian/source
+echo 1 > debian/source/format
+
+# Build the source and packages files
+debuild -i -us -uc
+
+cd /app/
+rm sounds -fr
+
+# Build freeswitch-sounds-en-ca-june packages
+
+cp -r /app/freeswitch-sounds /app/freeswitch-sounds-en-ca-june
+cd /app/freeswitch-sounds-en-ca-june
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+# Install the dependencies
+apt update
+apt install -f -y sox flac
+
+# Download the sources
+mkdir -p /app/sounds
+cp -R debian /app/sounds/
+cd /app/sounds
+./debian/bootstrap.sh -p freeswitch-sounds-en-ca-june
+./debian/rules get-orig-source
+
+tar -xv --strip-components=1 -f *_*.orig.tar.xz && rm *_*.orig.tar.xz
+
+# Create the updated version
+rm debian/changelog
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch-sounds-en-ca-june" --newversion "${FSSOUNDS_VERSION_JUNE}" "Release for ProVoice on Ubuntu 22.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
+
+# Fix version number
+cp debian/changelog debian/freeswitch-sounds-en-ca-june.changelog
+
+# Install the dependencies
+apt update
+mk-build-deps
+apt install -f -y ./freeswitch-sounds-en-ca-june-build-deps_*.deb
+rm ./freeswitch-sounds-en-ca-june-build-deps_*.deb
 
 # Allow creating the source file
 mkdir -p debian/source
@@ -199,7 +265,7 @@ find /app/patches -name '*.patch' -exec git apply '{}' \;
 
 # Create the updated version
 rm debian/changelog
-DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch" --newversion "${FREESWITCH_VERSION}" "Release for ProVoice on Ubuntu 20.04 LTS"
+DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch --create --package "freeswitch" --newversion "${FREESWITCH_VERSION}" "Release for ProVoice on Ubuntu 22.04 LTS"
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -l+provoice ""
 DEBEMAIL="Thomas Lobker <thomas@mediaserve.nl>" dch -r ""
 
@@ -208,6 +274,9 @@ apt update
 mk-build-deps
 apt install -f -y ./freeswitch-build-deps_*.deb
 rm ./freeswitch-build-deps_*.deb
+
+# Let FreeSWITCH find python2 when looking for python
+ln -s /usr/bin/python2 /usr/bin/python
 
 # Allow creating the source file
 mkdir -p debian/source
@@ -227,6 +296,7 @@ rsync -Sxt \
  --exclude freeswitch-sounds \
  --exclude freeswitch-sounds-en-us-allison \
  --exclude freeswitch-sounds-en-us-callie \
+ --exclude freeswitch-sounds-en-ca-june \
  --exclude sofia-sip \
  --exclude spandsp \
  --exclude packages \
