@@ -17,6 +17,10 @@ git clone https://github.com/ProVoice/provoice-build-freeswitch.git
 cd provoice-build-freeswitch
 git submodule init
 git submodule update --remote
+( cd freeswitch; git checkout v1.10.9 )
+( cd freeswitch-sounds; git checkout master )
+( cd sofia-sip; git checkout v1.13.14 )
+( cd spandsp; git checkout master )
 sudo docker build -t provoice-build-freeswitch .
 ```
 2. Create a directory for the packages
@@ -29,9 +33,9 @@ sudo docker run -it \
  --rm \
  -v `pwd`/packages:/app/packages \
  -v `pwd`/patches:/app/patches \
- -e FREESWITCH_VERSION='1.10.8' \
- -e SOFIASIP_VERSION='1.13.9' \
- -e SPANDSP_VERSION='3.0.2' \
+ -e FREESWITCH_VERSION='1.10.9' \
+ -e SOFIASIP_VERSION='1.13.14' \
+ -e SPANDSP_VERSION='3.0.0' \
  -e FSSOUNDS_VERSION='1.0.53' \
  -e FSSOUNDS_VERSION_CALLIE='1.0.53' \
  -e FSSOUNDS_VERSION_ALLISON='1.0.2' \

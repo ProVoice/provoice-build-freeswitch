@@ -1,7 +1,7 @@
 [submodule "freeswitch"]
 	path = freeswitch
 	url = https://github.com/ProVoice/freeswitch.git
-	branch = v1.10
+	branch = master
 [submodule "sofia-sip"]
 	path = sofia-sip
 	url = https://github.com/ProVoice/sofia-sip.git

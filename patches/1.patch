@@ -1,8 +1,8 @@
 diff --git a/configure.ac b/configure.ac
-index f8b9cadaf6..7270f08424 100644
+index d90a27a0ed..792db35263 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1763,7 +1763,7 @@ then
+@@ -1754,7 +1754,7 @@ then
  
  		AC_MSG_CHECKING([for python distutils])
  		python_result="`$PYTHON -c 'import distutils;' 2>&1`"
@@ -11,7 +11,7 @@ index f8b9cadaf6..7270f08424 100644
  			python_has_distutils="yes"
  		else
  			python_has_distutils="no"
-@@ -1884,7 +1884,7 @@ then
+@@ -1875,7 +1875,7 @@ then
  
  		AC_MSG_CHECKING([for python3 distutils])
  		python3_result="`$PYTHON3 -c 'import distutils;' 2>&1`"
@@ -21,7 +21,7 @@ index f8b9cadaf6..7270f08424 100644
  		else
  			python3_has_distutils="no"
 diff --git a/debian/bootstrap.sh b/debian/bootstrap.sh
-index 71c5b52f99..42328bab0a 100755
+index 6b1a83b86b..bca055f2d2 100755
 --- a/debian/bootstrap.sh
 +++ b/debian/bootstrap.sh
 @@ -2,7 +2,7 @@
@@ -85,7 +85,7 @@ index 71c5b52f99..42328bab0a 100755
 + uuid-dev, libexpat1-dev, libgdbm-dev, libgdbm-compat-dev, libdb-dev,
  # used by many modules
   libcurl4-openssl-dev | libcurl4-gnutls-dev | libcurl-dev,
-  bison, zlib1g-dev, libsofia-sip-ua-dev (>= 1.13.6),
+  bison, zlib1g-dev, libsofia-sip-ua-dev (>= 1.13.12),
 diff --git a/debian/control-modules b/debian/control-modules
 index b9d7a05933..d9ebe40737 100644
 --- a/debian/control-modules
@@ -109,15 +109,15 @@ index b9d7a05933..d9ebe40737 100644
  Module: languages/mod_python3
  Description: mod_python3
 diff --git a/debian/rules b/debian/rules
-index c11f733e8c..7473817bcb 100755
+index 88aaee3f71..2befc97bdd 100755
 --- a/debian/rules
 +++ b/debian/rules
 @@ -74,7 +74,7 @@ override_dh_auto_clean:
  		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
  		--prefix=/usr --localstatedir=/var --sysconfdir=/etc \
  		--with-gnu-ld --with-python --with-python3 --with-erlang --with-openssl \
--		--enable-core-odbc-support --enable-zrtp
-+		--enable-core-odbc-support --enable-zrtp --disable-libvpx
+-		--enable-core-odbc-support
++		--enable-core-odbc-support --disable-libvpx
  	touch $@
  
  override_dh_auto_configure: .stamp-configure

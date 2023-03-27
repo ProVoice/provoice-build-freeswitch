@@ -77,10 +77,10 @@ index e6ceb6d837..e69de29bb2 100644
 -|                                                               |
 -.===============================================================.
 diff --git a/libs/esl/fs_cli.c b/libs/esl/fs_cli.c
-index 76e85b450d..11a3bb952a 100644
+index 973df741e0..11dd023a30 100644
 --- a/libs/esl/fs_cli.c
 +++ b/libs/esl/fs_cli.c
-@@ -1041,24 +1041,9 @@ static const char *basic_gets(int *cnt)
+@@ -1042,24 +1042,9 @@ static const char *basic_gets(int *cnt)
  	return command_buf;
  }
  
@@ -108,7 +108,7 @@ index 76e85b450d..11a3bb952a 100644
  
  static void print_banner(FILE *stream, int color)
  {
-@@ -1082,7 +1067,7 @@ static void print_banner(FILE *stream, int color)
+@@ -1083,7 +1068,7 @@ static void print_banner(FILE *stream, int color)
  	}
  
  	/* Print the rest info in default colors */
@@ -117,7 +117,7 @@ index 76e85b450d..11a3bb952a 100644
  #else
  
  	if (color) {
-@@ -1099,7 +1084,7 @@ static void print_banner(FILE *stream, int color)
+@@ -1100,7 +1085,7 @@ static void print_banner(FILE *stream, int color)
  		fprintf(stream, "%s", ESL_SEQ_DEFAULT_COLOR);
  	}
  
@@ -126,7 +126,7 @@ index 76e85b450d..11a3bb952a 100644
  
  
  	if (color) {
-@@ -1107,9 +1092,6 @@ static void print_banner(FILE *stream, int color)
+@@ -1108,9 +1093,6 @@ static void print_banner(FILE *stream, int color)
  	}
  #endif
  
@@ -158,3 +158,47 @@ index e92d2cd6e9..bb4ff4bef1 100644
 -
 +const char *cc = "";
 +const char *cc_s = "";
+diff --git a/src/switch_core.c b/src/switch_core.c
+index 83db2fc0d9..0efb7df6f6 100644
+--- a/src/switch_core.c
++++ b/src/switch_core.c
+@@ -2404,24 +2404,7 @@ static void switch_load_core_config(const char *file)
+ 
+ SWITCH_DECLARE(const char *) switch_core_banner(void)
+ {
+-
+-	return ("\n"
+-			".=============================================================.\n"
+-			"|   _____              ______        _____ _____ ____ _   _   |\n"
+-			"|  |  ___| __ ___  ___/ ___\\ \\      / /_ _|_   _/ ___| | | |  |\n"
+-			"|  | |_ | '__/ _ \\/ _ \\___ \\\\ \\ /\\ / / | |  | || |   | |_| |  |\n"
+-			"|  |  _|| | |  __/  __/___) |\\ V  V /  | |  | || |___|  _  |  |\n"
+-			"|  |_|  |_|  \\___|\\___|____/  \\_/\\_/  |___| |_| \\____|_| |_|  |\n"
+-			"|                                                             |\n"
+-			".=============================================================."
+-			"\n"
+-
+-			"|   Anthony Minessale II, Michael Jerris, Brian West, Others  |\n"
+-			"|   FreeSWITCH (http://www.freeswitch.org)                    |\n"
+-			"|   Paypal Donations Appreciated: paypal@freeswitch.org       |\n"
+-			"|   Brought to you by ClueCon http://www.cluecon.com/         |\n"
+-			".=============================================================.\n"
+-			"\n");
++	return ("\nFreeSWITCH 1.10.9 (ProVoice)");
+ }
+ 
+ switch_status_t switch_core_sqldb_init(const char **err)
+@@ -2491,12 +2474,7 @@ SWITCH_DECLARE(switch_status_t) switch_core_init_and_modload(switch_core_flag_t
+ #ifdef WIN32
+ 	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_CONSOLE, "%s%s\n\n", switch_core_banner(), use);
+ #else
+-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_CONSOLE, "%s%s%s%s%s%s\n\n",
+-					  SWITCH_SEQ_DEFAULT_COLOR,
+-					  SWITCH_SEQ_FYELLOW, SWITCH_SEQ_BBLUE,
+-					  switch_core_banner(),
+-					  use, SWITCH_SEQ_DEFAULT_COLOR);
+-
++	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_CONSOLE, "%s%s%s\n\n", switch_core_banner(), use, SWITCH_SEQ_DEFAULT_COLOR);
+ #endif
+ 
+ 
