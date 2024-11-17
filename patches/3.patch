@@ -1,112 +1,59 @@
-diff --git a/src/switch_apr.c b/src/switch_apr.c
-index 9bc5d8a759..58f333c964 100644
---- a/src/switch_apr.c
-+++ b/src/switch_apr.c
-@@ -74,7 +74,7 @@
- #if (defined(HAVE_LIBMD5) || defined(HAVE_LIBMD) || defined(HAVE_MD5INIT))
- #include <md5.h>
- #elif defined(HAVE_LIBCRYPTO)
--#include <openssl/md5.h>
-+#include <openssl/evp.h>
- #endif
+diff --git a/src/mod/applications/mod_spandsp/mod_spandsp_dsp.c b/src/mod/applications/mod_spandsp/mod_spandsp_dsp.c
+index 836808a48d..eaa7dc919e 100644
+--- a/src/mod/applications/mod_spandsp/mod_spandsp_dsp.c
++++ b/src/mod/applications/mod_spandsp/mod_spandsp_dsp.c
+@@ -34,6 +34,7 @@
+  */
  
- #ifndef WIN32
-@@ -1174,11 +1174,12 @@ SWITCH_DECLARE(switch_status_t) switch_md5(unsigned char digest[SWITCH_MD5_DIGES
+ #include "mod_spandsp.h"
++#include <spandsp/version.h>
  
- 	return SWITCH_STATUS_SUCCESS;
- #elif defined(HAVE_LIBCRYPTO)
--	MD5_CTX md5_context;
--
--	MD5_Init(&md5_context);
--	MD5_Update(&md5_context, input, inputLen);
--	MD5_Final(digest, &md5_context);
-+	EVP_MD_CTX *md5_context;
-+	md5_context = EVP_MD_CTX_new();
-+	EVP_DigestInit_ex(md5_context, EVP_md5(), NULL);
-+	EVP_DigestUpdate(md5_context, input, inputLen);
-+	EVP_DigestFinal_ex(md5_context, digest, NULL);
-+	EVP_MD_CTX_free(md5_context);
+ #define TDD_LEAD 10
  
- 	return SWITCH_STATUS_SUCCESS;
- #else
-diff --git a/src/switch_core_cert.c b/src/switch_core_cert.c
-index c4fdd84210..a786ce013f 100644
---- a/src/switch_core_cert.c
-+++ b/src/switch_core_cert.c
-@@ -410,7 +410,6 @@ static int mkcert(X509 **x509p, EVP_PKEY **pkeyp, int bits, int serial, int days
+@@ -152,6 +153,10 @@ static void put_text_msg(void *user_data, const uint8_t *msg, int len)
+ 
+ }
+ 
++#if defined(SPANDSP_RELEASE_DATE) && (SPANDSP_RELEASE_DATE > 20120902)
++#define V18_MODE_5BIT_4545 V18_MODE_WEITBRECHT_5BIT_4545
++#define V18_MODE_5BIT_50   V18_MODE_WEITBRECHT_5BIT_50
++#endif
+ static int get_v18_mode(switch_core_session_t *session)
  {
- 	X509 *x;
- 	EVP_PKEY *pk;
--	RSA *rsa;
- 	X509_NAME *name=NULL;
- 
- 	switch_assert(pkeyp);
-@@ -432,7 +431,23 @@ static int mkcert(X509 **x509p, EVP_PKEY **pkeyp, int bits, int serial, int days
- 		x = *x509p;
+ 	switch_channel_t *channel = switch_core_session_get_channel(session);
+@@ -213,7 +218,11 @@ switch_status_t spandsp_tdd_send_session(switch_core_session_t *session, const c
+ 		return SWITCH_STATUS_FALSE;
  	}
  
--#if OPENSSL_VERSION_NUMBER >= 0x10100000
-+#if OPENSSL_VERSION_NUMBER >= 0x30000000
-+	{
-+		EVP_PKEY_CTX *ctx;
-+		ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
-+		/* Setup the key context */
-+		if ((!ctx) || (EVP_PKEY_keygen_init(ctx) <= 0) || (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, bits) <= 0)) {
-+			abort();
-+			goto err;
-+		}
-+		/* Generate key */
-+		if (EVP_PKEY_generate(ctx, &pk) <= 0) {
-+			abort();
-+			goto err;
-+		}
-+		EVP_PKEY_CTX_free(ctx);
-+	}
-+#elif OPENSSL_VERSION_NUMBER >= 0x10100000
- 	rsa = RSA_new();
- 	{
- 		static const BN_ULONG ULONG_RSA_F4 = RSA_F4;
-@@ -449,12 +464,6 @@ static int mkcert(X509 **x509p, EVP_PKEY **pkeyp, int bits, int serial, int days
- 	rsa = RSA_generate_key(bits, RSA_F4, NULL, NULL);
- #endif
++#if defined(SPANDSP_RELEASE_DATE) && (SPANDSP_RELEASE_DATE > 20120902)
++	tdd_state = v18_init(NULL, TRUE, get_v18_mode(session), V18_AUTOMODING_GLOBAL, put_text_msg, NULL, NULL, NULL);
++#else
+ 	tdd_state = v18_init(NULL, TRUE, get_v18_mode(session), V18_AUTOMODING_GLOBAL, put_text_msg, NULL);
++#endif
  
--	if (!EVP_PKEY_assign_RSA(pk, rsa)) {
--		abort();
--	}
--
--	rsa = NULL;
--
- 	X509_set_version(x, 2);
- 	ASN1_INTEGER_set(X509_get_serialNumber(x), serial);
- 	X509_gmtime_adj(X509_get_notBefore(x), -(long)60*60*24*7);
-diff --git a/src/switch_rtp.c b/src/switch_rtp.c
-index e9f2c53c81..ea481ccb3c 100644
---- a/src/switch_rtp.c
-+++ b/src/switch_rtp.c
-@@ -3878,7 +3878,7 @@ SWITCH_DECLARE(switch_status_t) switch_rtp_add_dtls(switch_rtp_t *rtp_session, d
- 	const SSL_METHOD *ssl_method;
- 	SSL_CTX *ssl_ctx;
- 	BIO *bio;
--	DH *dh;
-+	EVP_PKEY *dh_pk;
- 	switch_status_t status = SWITCH_STATUS_SUCCESS;
- #ifndef OPENSSL_NO_EC
- #if OPENSSL_VERSION_NUMBER < 0x10002000L
-@@ -3958,12 +3958,12 @@ SWITCH_DECLARE(switch_status_t) switch_rtp_add_dtls(switch_rtp_t *rtp_session, d
- 	switch_assert(dtls->ssl_ctx);
  
- 	bio = BIO_new_file(dtls->pem, "r");
--	dh = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
--	BIO_free(bio);
--	if (dh) {
--		SSL_CTX_set_tmp_dh(dtls->ssl_ctx, dh);
--		DH_free(dh);
-+
-+	if((dh_pk = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL)) != NULL) {
-+		SSL_CTX_set0_tmp_dh_pkey(dtls->ssl_ctx, dh_pk);
-+		EVP_PKEY_free(dh_pk);
+ 	v18_put(tdd_state, text, -1);
+@@ -260,7 +269,11 @@ switch_status_t spandsp_tdd_encode_session(switch_core_session_t *session, const
  	}
-+	BIO_free(bio);
  
- 	SSL_CTX_set_mode(dtls->ssl_ctx, SSL_MODE_AUTO_RETRY);
+ 	pvt->session = session;
++#if defined(SPANDSP_RELEASE_DATE) && (SPANDSP_RELEASE_DATE > 20120902)
++	pvt->tdd_state = v18_init(NULL, TRUE, get_v18_mode(session), V18_AUTOMODING_GLOBAL, put_text_msg, NULL, NULL, NULL);
++#else
+ 	pvt->tdd_state = v18_init(NULL, TRUE, get_v18_mode(session), V18_AUTOMODING_GLOBAL, put_text_msg, NULL);
++#endif
+ 	pvt->head_lead = TDD_LEAD;
  
+ 	v18_put(pvt->tdd_state, text, -1);
+@@ -338,7 +351,11 @@ switch_status_t spandsp_tdd_decode_session(switch_core_session_t *session)
+ 	}
+ 
+ 	pvt->session = session;
++#if defined(SPANDSP_RELEASE_DATE) && (SPANDSP_RELEASE_DATE > 20120902)
++	pvt->tdd_state = v18_init(NULL, FALSE, get_v18_mode(session), V18_AUTOMODING_GLOBAL, put_text_msg, pvt, NULL, NULL);
++#else
+ 	pvt->tdd_state = v18_init(NULL, FALSE, get_v18_mode(session), V18_AUTOMODING_GLOBAL, put_text_msg, pvt);
++#endif
+ 
+ 	if ((status = switch_core_media_bug_add(session, "spandsp_tdd_decode", NULL,
+ 						tdd_decode_callback, pvt, 0, SMBF_READ_REPLACE | SMBF_NO_PAUSE, &bug)) != SWITCH_STATUS_SUCCESS) {

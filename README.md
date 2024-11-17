@@ -3,7 +3,7 @@ ProVoice packages build environment for FreeSWITCH using Docker
 
 ## About
 
-This project aims to make reproducable Debian packages of FreeSWITCH for Ubuntu 22.04 LTS by using Docker. We have chosen to use upstream MySQL packages instead of the default packages in the Ubuntu repository. Feel free to remove these lines in the Dockerfile if that would fit your environment better. Create an empty directory for the packages and run the container to build the Debian packages.
+This project aims to make reproducable Debian packages of FreeSWITCH for Ubuntu 24.04 LTS by using Docker. We have chosen to use upstream MySQL packages instead of the default packages in the Ubuntu repository. Feel free to remove these lines in the Dockerfile if that would fit your environment better. Create an empty directory for the packages and run the container to build the Debian packages.
 
 In this build we are removing the Cluecon advertisements from the CLI. Version numbers for the packages have to be set through environmental variables while running the Docker container.
 
@@ -17,9 +17,9 @@ git clone https://github.com/ProVoice/provoice-build-freeswitch.git
 cd provoice-build-freeswitch
 git submodule init
 git submodule update --remote
-( cd freeswitch; git checkout v1.10.9 )
+( cd freeswitch; git checkout v1.10.12 )
 ( cd freeswitch-sounds; git checkout master )
-( cd sofia-sip; git checkout v1.13.14 )
+( cd sofia-sip; git checkout v1.13.17 )
 ( cd spandsp; git checkout master )
 sudo docker build -t provoice-build-freeswitch .
 ```
@@ -33,8 +33,8 @@ sudo docker run -it \
  --rm \
  -v `pwd`/packages:/app/packages \
  -v `pwd`/patches:/app/patches \
- -e FREESWITCH_VERSION='1.10.9' \
- -e SOFIASIP_VERSION='1.13.14' \
+ -e FREESWITCH_VERSION='1.10.12' \
+ -e SOFIASIP_VERSION='1.13.17' \
  -e SPANDSP_VERSION='3.0.0' \
  -e FSSOUNDS_VERSION='1.0.53' \
  -e FSSOUNDS_VERSION_CALLIE='1.0.53' \
@@ -42,4 +42,4 @@ sudo docker run -it \
  -e FSSOUNDS_VERSION_JUNE='1.0.51' \
 provoice-build-freeswitch
 ```
-The packages and source files should now be in the `packages` directory and ready to install on Ubuntu 22.04 LTS.
+The packages and source files should now be in the `packages` directory and ready to install on Ubuntu 24.04 LTS.
