@@ -43,3 +43,23 @@ sudo docker run -it \
 provoice-build-freeswitch
 ```
 The packages and source files should now be in the `packages` directory and ready to install on Ubuntu 24.04 LTS.
+
+Note: in order to get AMR support (bring your own licensing) in FreeSWITCH you need to install the libraries included in Ubuntu and copy them to the AMR modules source directories, right before bootstrapping and building the FreeSWITCH packages.
+
+```
+...
+
+apt install libvo-amrwbenc0 libvo-amrwbenc-dev libopencore-amrwb0 libopencore-amrwb-dev libopencore-amrnb0 libopencore-amrnb-dev
+
+# Copy over AMR files
+
+RUN cp /usr/include/opencore-amrnb/interf_enc.h src/mod/codecs/mod_amr/
+RUN cp /usr/include/opencore-amrnb/interf_dec.h src/mod/codecs/mod_amr/
+RUN cp /usr/include/opencore-amrwb/dec_if.h  src/mod/codecs/mod_amrwb/
+RUN cp /usr/include/vo-amrwbenc/enc_if.h src/mod/codecs/mod_amrwb/
+
+# Bootstrap FreeSWITCH Debian files
+( cd debian && ./bootstrap.sh )
+
+...
+```
