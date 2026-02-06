@@ -21,7 +21,7 @@ index 469d5399a4..942928fdca 100644
  		else
  			python3_has_distutils="no"
 diff --git a/debian/bootstrap.sh b/debian/bootstrap.sh
-index fa40702938..305c9b0e53 100755
+index fa40702938..82540a1e05 100755
 --- a/debian/bootstrap.sh
 +++ b/debian/bootstrap.sh
 @@ -2,7 +2,7 @@
@@ -74,7 +74,13 @@ index fa40702938..305c9b0e53 100755
  manual_pkgs=(
  freeswitch-all
  freeswitch
-@@ -335,7 +360,7 @@ Build-Depends:
+@@ -330,12 +355,12 @@ Build-Depends:
+  libogg-dev, libspeex-dev, libspeexdsp-dev,
+ # configure options
+  libssl1.0-dev | libssl-dev, unixodbc-dev, libpq-dev,
+- libncurses5-dev, libjpeg62-turbo-dev | libjpeg-turbo8-dev | libjpeg62-dev | libjpeg8-dev,
++ libncurses5-dev | libncurses-dev, libjpeg62-turbo-dev | libjpeg-turbo8-dev | libjpeg62-dev | libjpeg8-dev,
+  python-dev | python-dev-is-python2 | python-dev-is-python3, python3-dev, python-all-dev | python3-all-dev, python-support (>= 0.90) | dh-python, erlang-dev, libtpl-dev (>= 1.5),
  # documentation
   doxygen,
  # for APR (not essential for build)
@@ -84,7 +90,7 @@ index fa40702938..305c9b0e53 100755
   libcurl4-openssl-dev | libcurl4-gnutls-dev | libcurl-dev,
   bison, zlib1g-dev, libsofia-sip-ua-dev (>= 1.13.17),
 diff --git a/debian/control-modules b/debian/control-modules
-index 0f0784d3f5..73ca93a615 100644
+index 0f0784d3f5..830e43d83a 100644
 --- a/debian/control-modules
 +++ b/debian/control-modules
 @@ -11,7 +11,7 @@ Description: Abstraction layer for APIs
@@ -96,6 +102,15 @@ index 0f0784d3f5..73ca93a615 100644
  Build-Depends-Bookworm: libavformat-dev, libswscale-dev, libswresample-dev
  
  Module: applications/mod_avmd
+@@ -39,7 +39,7 @@ Description: Caller ID name lookup
+ Module: applications/mod_cluechoo
+ Description: Clue Choo
+  This demo module renders a Clue Choo train on the FreeSWITCH console.
+-Build-Depends: libncurses5-dev
++Build-Depends: libncurses5-dev | libncurses-dev
+ 
+ Module: applications/mod_commands
+ Description: Command module
 @@ -661,7 +661,7 @@ Build-Depends-Bookworm: libperl-dev, libgdbm-compat-dev
  Module: languages/mod_python
  Description: mod_python

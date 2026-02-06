@@ -83,10 +83,14 @@ sed -i 's/http:\/\/docbook.sourceforge.net\/release\/xsl\/current\/xhtml\/chunk.
 # Fix the lib directories
 sed -i 's|pkgconfigdir = $(libdir)/pkgconfig|pkgconfigdir = /usr/lib/pkgconfig|' Makefile.am
 sed -i 's|%{_libdir}/pkgconfig/spandsp.pc|/usr/lib/pkgconfig/spandsp.pc|' spandsp.spec
-sed -i 's|debian/tmp/usr/lib/.*/libspandsp.so.*|debian/tmp/usr/lib64/libspandsp.so.*|' debian/libspandsp3.install
-sed -i 's|debian/tmp/usr/lib/.*/libspandsp.so|debian/tmp/usr/lib64/libspandsp.so|' debian/libspandsp3-dev.install
-sed -i 's|debian/tmp/usr/lib/.*/libspandsp.a|debian/tmp/usr/lib64/libspandsp.a|' debian/libspandsp3-dev.install
+sed -i 's|debian/tmp/usr/lib64/libspandsp.so.*|debian/tmp/usr/lib/*/libspandsp.so.*|' debian/libspandsp3.install
+sed -i 's|debian/tmp/usr/lib64/libspandsp.so|debian/tmp/usr/lib/*/libspandsp.so|' debian/libspandsp3-dev.install
+sed -i 's|debian/tmp/usr/lib64/libspandsp.a|debian/tmp/usr/lib/*/libspandsp.a|' debian/libspandsp3-dev.install
 sed -i 's|debian/tmp/usr/lib/.*/pkgconfig/spandsp.pc|debian/tmp/usr/lib/pkgconfig/spandsp.pc|' debian/libspandsp3-dev.install
+
+# Force libraries to install in the correct multiarch directory
+export DEB_HOST_MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+export DEB_CONFIGURE_EXTRA_FLAGS="--libdir=/usr/lib/${DEB_HOST_MULTIARCH}"
 
 # Build the source and packages files
 debuild -i -us -uc
